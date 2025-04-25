@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -9,17 +10,18 @@ const Index = () => {
     console.log("Current path:", location.pathname);
     console.log("Current hash:", location.hash);
     
-    // Check if the URL is specifically for admin
-    if (location.pathname === '/admin' || location.pathname.startsWith('/admin/') || location.hash === '#admin') {
-      console.log("Redirecting to admin panel");
-      navigate('/admin');
+    // Check if the URL contains 'admin' anywhere in the path
+    if (location.pathname.includes('admin')) {
+      console.log("Admin path detected, redirecting to admin panel");
+      navigate('/admin', { replace: true });
       return;
     }
     
     // Otherwise redirect to initial redirect
     console.log("Redirecting to initial-redirect");
     navigate('/initial-redirect', {
-      state: { url: 'https://example.com' }
+      state: { url: 'https://example.com' },
+      replace: true
     });
   }, [navigate, location]);
   
