@@ -25,18 +25,27 @@ const App = () => {
       try {
         console.log("Starting enhanced adblock detection check...");
         
-        // Add a small delay to ensure the page is fully loaded
-        await new Promise(resolve => setTimeout(resolve, 200));
+        // First check - immediate
+        const initialCheck = await checkForAdBlocker();
         
-        // Main detection check
-        const isBlocked = await checkForAdBlocker();
+        // If initial check detects an adblocker, no need for second check
+        if (initialCheck) {
+          console.log("Adblock detected on initial check");
+          setAdBlockerDetected(true);
+          setCheckComplete(true);
+          return;
+        }
+        
+        // Second check with delay - some adblockers take time to activate
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const secondCheck = await checkForAdBlocker();
         
         // Set the final result
-        setAdBlockerDetected(isBlocked);
-        console.log(`Adblock final detection result: ${isBlocked ? "BLOCKED" : "NOT BLOCKED"}`);
+        setAdBlockerDetected(initialCheck || secondCheck);
+        console.log(`Adblock final detection result: ${initialCheck || secondCheck ? "BLOCKED" : "NOT BLOCKED"}`);
       } catch (error) {
         console.error("Error in adblock detection:", error);
-        setAdBlockerDetected(false); // Don't assume blocked on error
+        setAdBlockerDetected(true); // Assume blocked on error
       } finally {
         setCheckComplete(true);
       }
@@ -44,19 +53,30 @@ const App = () => {
 
     detectAdBlocker();
     
-    // No need for interval checking - it can cause false positives
-  }, []);
+    // Re-check periodically in case adblocker is activated after initial load
+    const intervalCheck = setInterval(async () => {
+      try {
+        if (!adBlockerDetected) {
+          const isBlocked = await checkForAdBlocker();
+          if (isBlocked) {
+            console.log("Adblock detected during interval check");
+            setAdBlockerDetected(true);
+          }
+        }
+      } catch (error) {
+        console.error("Error in interval adblock check:", error);
+      }
+    }, 15000); // Check every 15 seconds (reduced from 30)
+    
+    return () => clearInterval(intervalCheck);
+  }, [adBlockerDetected]);
 
-  // Check URL for bypass parameter
-  const urlParams = new URLSearchParams(window.location.search);
-  const bypassAdBlocker = urlParams.get('bypassAdBlockCheck') === 'true';
-
-  if (adBlockerDetected === true && !bypassAdBlocker) {
+  if (adBlockerDetected === true) {
     return <AdBlockerDetected />;
   }
 
-  // Only render the app when check is complete
-  if (checkComplete && (adBlockerDetected === false || bypassAdBlocker)) {
+  // Only render the app when we've confirmed no adblocker is present and check is complete
+  if (checkComplete && adBlockerDetected === false) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>

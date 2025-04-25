@@ -1,4 +1,3 @@
-
 // Settings configuration storage and management
 import { useState, useEffect } from 'react';
 
@@ -91,7 +90,7 @@ const defaultSettings: AppSettings = {
   adBlockTitle: "Ad Blocker Detected",
   adBlockDescription: "This site requires ad capability to function properly. Please disable your ad blocker or whitelist this site.",
   adBlockReloadButtonText: "Reload with Ads Enabled",
-  adBlockDismissButtonText: "Continue Anyway",
+  adBlockDismissButtonText: "Dismiss",
   adBlockHelpText: "Need help? Check our",
   adBlockHelpLink: "#",
 };
