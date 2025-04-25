@@ -18,6 +18,10 @@ export const AdBlockerDetected = () => {
 
   const handleDismiss = () => {
     setIsVisible(false);
+    // Add a parameter to the URL to bypass the check
+    const url = new URL(window.location.href);
+    url.searchParams.set('bypassAdBlockCheck', 'true');
+    window.location.href = url.toString();
   };
 
   if (!isVisible) return null;
@@ -49,10 +53,18 @@ export const AdBlockerDetected = () => {
           <div className="flex space-x-3">
             <Button 
               onClick={handleReload} 
-              className="w-full bg-redirector-primary text-white hover:bg-redirector-primary/90 transition-colors"
+              className="w-1/2 bg-redirector-primary text-white hover:bg-redirector-primary/90 transition-colors"
               disabled={isReloading}
             >
               {isReloading ? 'Reloading...' : settings.adBlockReloadButtonText}
+            </Button>
+            
+            <Button 
+              onClick={handleDismiss}
+              variant="outline"
+              className="w-1/2"
+            >
+              {settings.adBlockDismissButtonText}
             </Button>
           </div>
         </div>
