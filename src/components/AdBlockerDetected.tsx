@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import { AlertCircle, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { useSettingsManager } from '../utils/settingsManager';
+import { useNavigate } from 'react-router-dom';
 
 export const AdBlockerDetected = () => {
   const [isReloading, setIsReloading] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const { settings } = useSettingsManager();
+  const navigate = useNavigate();
   
   const handleReload = () => {
     setIsReloading(true);
@@ -18,6 +20,13 @@ export const AdBlockerDetected = () => {
 
   const handleDismiss = () => {
     setIsVisible(false);
+  };
+
+  const handleContinueAnyway = () => {
+    // Set a session storage flag to bypass ad blocker detection
+    sessionStorage.setItem('bypassAdBlockCheck', 'true');
+    // Refresh the page to apply the bypass
+    window.location.reload();
   };
 
   if (!isVisible) return null;
@@ -46,13 +55,21 @@ export const AdBlockerDetected = () => {
             {settings.adBlockDescription}
           </p>
           
-          <div className="flex space-x-3">
+          <div className="flex flex-col space-y-3">
             <Button 
               onClick={handleReload} 
               className="w-full bg-redirector-primary text-white hover:bg-redirector-primary/90 transition-colors"
               disabled={isReloading}
             >
               {isReloading ? 'Reloading...' : settings.adBlockReloadButtonText}
+            </Button>
+            
+            <Button
+              onClick={handleContinueAnyway}
+              variant="outline"
+              className="w-full border-redirector-primary/30 text-redirector-primary hover:bg-redirector-primary/10"
+            >
+              {settings.adBlockContinueAnywayText || "Continue Anyway"}
             </Button>
           </div>
         </div>

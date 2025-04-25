@@ -1,3 +1,4 @@
+
 // Settings configuration storage and management
 import { useState, useEffect } from 'react';
 
@@ -47,6 +48,7 @@ export interface AppSettings {
   adBlockDescription: string;
   adBlockReloadButtonText: string;
   adBlockDismissButtonText: string;
+  adBlockContinueAnywayText: string;
   adBlockHelpText: string;
   adBlockHelpLink: string;
 }
@@ -91,6 +93,7 @@ const defaultSettings: AppSettings = {
   adBlockDescription: "This site requires ad capability to function properly. Please disable your ad blocker or whitelist this site.",
   adBlockReloadButtonText: "Reload with Ads Enabled",
   adBlockDismissButtonText: "Dismiss",
+  adBlockContinueAnywayText: "Continue Anyway",
   adBlockHelpText: "Need help? Check our",
   adBlockHelpLink: "#",
 };

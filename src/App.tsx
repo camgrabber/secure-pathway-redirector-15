@@ -23,29 +23,31 @@ const App = () => {
   useEffect(() => {
     const detectAdBlocker = async () => {
       try {
+        // Check for bypass flag in session storage
+        if (sessionStorage.getItem('bypassAdBlockCheck') === 'true') {
+          console.log("Adblock check bypassed by user");
+          setAdBlockerDetected(false);
+          setCheckComplete(true);
+          return;
+        }
+        
         console.log("Starting enhanced adblock detection check...");
         
         // First check - immediate
         const initialCheck = await checkForAdBlocker();
         
-        // If initial check detects an adblocker, no need for second check
-        if (initialCheck) {
-          console.log("Adblock detected on initial check");
-          setAdBlockerDetected(true);
-          setCheckComplete(true);
-          return;
-        }
-        
-        // Second check with delay - some adblockers take time to activate
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const secondCheck = await checkForAdBlocker();
-        
-        // Set the final result
-        setAdBlockerDetected(initialCheck || secondCheck);
-        console.log(`Adblock final detection result: ${initialCheck || secondCheck ? "BLOCKED" : "NOT BLOCKED"}`);
+        // Update state based on check results
+        setAdBlockerDetected(initialCheck);
+        console.log(`Adblock final detection result: ${initialCheck ? "BLOCKED" : "NOT BLOCKED"}`);
       } catch (error) {
         console.error("Error in adblock detection:", error);
-        setAdBlockerDetected(true); // Assume blocked on error
+        // Only assume blocked on certain errors
+        if (error instanceof TypeError || error.name === 'SecurityError') {
+          setAdBlockerDetected(true);
+        } else {
+          // For other errors, don't assume blocked
+          setAdBlockerDetected(false);
+        }
       } finally {
         setCheckComplete(true);
       }
@@ -53,23 +55,9 @@ const App = () => {
 
     detectAdBlocker();
     
-    // Re-check periodically in case adblocker is activated after initial load
-    const intervalCheck = setInterval(async () => {
-      try {
-        if (!adBlockerDetected) {
-          const isBlocked = await checkForAdBlocker();
-          if (isBlocked) {
-            console.log("Adblock detected during interval check");
-            setAdBlockerDetected(true);
-          }
-        }
-      } catch (error) {
-        console.error("Error in interval adblock check:", error);
-      }
-    }, 15000); // Check every 15 seconds (reduced from 30)
-    
-    return () => clearInterval(intervalCheck);
-  }, [adBlockerDetected]);
+    // We're removing the interval check as it's causing false positives
+    // Users can bypass if needed using the Continue Anyway button
+  }, []);
 
   if (adBlockerDetected === true) {
     return <AdBlockerDetected />;
