@@ -59,18 +59,16 @@ const App = () => {
     // Users can bypass if needed using the Continue Anyway button
   }, []);
 
-  if (adBlockerDetected === true) {
-    return <AdBlockerDetected />;
-  }
-
-  // Only render the app when we've confirmed no adblocker is present and check is complete
-  if (checkComplete && adBlockerDetected === false) {
-    return (
+  // Wrap everything in BrowserRouter to make sure we have proper routing context
+  return (
+    <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
+          {adBlockerDetected === true ? (
+            <AdBlockerDetected />
+          ) : checkComplete && adBlockerDetected === false ? (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/initial-redirect" element={<InitialRedirect />} />
@@ -79,22 +77,20 @@ const App = () => {
               <Route path="/admin" element={<Admin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
+          ) : (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-200">
+              <div className="text-center">
+                <div className="w-12 h-12 border-4 border-redirector-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-lg font-medium text-gray-600">Initializing secure pathway...</p>
+                <p className="text-sm text-gray-500 mt-2">Please wait while we verify your browser compatibility</p>
+              </div>
+            </div>
+          )}
         </TooltipProvider>
       </QueryClientProvider>
-    );
-  }
-
-  // Show loading state while checking
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-200">
-      <div className="text-center">
-        <div className="w-12 h-12 border-4 border-redirector-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-lg font-medium text-gray-600">Initializing secure pathway...</p>
-        <p className="text-sm text-gray-500 mt-2">Please wait while we verify your browser compatibility</p>
-      </div>
-    </div>
+    </BrowserRouter>
   );
 };
 
 export default App;
+
