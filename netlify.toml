@@ -11,3 +11,14 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Add explicit rule for admin path
+[[redirects]]
+  from = "/admin"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/index.html"
+  status = 200

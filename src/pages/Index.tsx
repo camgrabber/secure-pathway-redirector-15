@@ -6,13 +6,18 @@ const Index = () => {
   const location = useLocation();
   
   useEffect(() => {
-    // Check if the URL has a hash for admin
-    if (location.pathname === '/admin' || location.hash === '#admin') {
+    console.log("Current path:", location.pathname);
+    console.log("Current hash:", location.hash);
+    
+    // Check if the URL is specifically for admin
+    if (location.pathname === '/admin' || location.pathname.startsWith('/admin/') || location.hash === '#admin') {
+      console.log("Redirecting to admin panel");
       navigate('/admin');
       return;
     }
     
     // Otherwise redirect to initial redirect
+    console.log("Redirecting to initial-redirect");
     navigate('/initial-redirect', {
       state: { url: 'https://example.com' }
     });
