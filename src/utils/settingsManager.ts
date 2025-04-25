@@ -1,4 +1,3 @@
-
 // Settings configuration storage and management
 import { useState, useEffect } from 'react';
 
@@ -34,6 +33,22 @@ export interface AppSettings {
   
   // Default destination (if none provided)
   defaultDestinationUrl: string;
+  
+  // SEO Settings
+  siteTitle: string;
+  siteDescription: string;
+  siteFavicon: string;
+  siteKeywords: string;
+  ogImage: string;
+  twitterHandle: string;
+  
+  // Ad Blocker Notification Settings
+  adBlockTitle: string;
+  adBlockDescription: string;
+  adBlockReloadButtonText: string;
+  adBlockDismissButtonText: string;
+  adBlockHelpText: string;
+  adBlockHelpLink: string;
 }
 
 // Default application settings
@@ -61,7 +76,23 @@ const defaultSettings: AppSettings = {
   
   footerText: `© ${new Date().getFullYear()} Secure Pathway Redirector. All rights reserved.`,
   
-  defaultDestinationUrl: "https://example.com"
+  defaultDestinationUrl: "https://example.com",
+  
+  // Default SEO Settings
+  siteTitle: "Secure Pathway Redirector",
+  siteDescription: "A secure and reliable redirection service",
+  siteFavicon: "/favicon.ico",
+  siteKeywords: "redirect, secure, pathway, link shortener",
+  ogImage: "https://lovable.dev/opengraph-image-p98pqg.png",
+  twitterHandle: "@securePathway",
+  
+  // Default Ad Blocker Notification Settings
+  adBlockTitle: "Ad Blocker Detected",
+  adBlockDescription: "This site requires ad capability to function properly. Please disable your ad blocker or whitelist this site.",
+  adBlockReloadButtonText: "Reload with Ads Enabled",
+  adBlockDismissButtonText: "Dismiss",
+  adBlockHelpText: "Need help? Check our",
+  adBlockHelpLink: "#",
 };
 
 // Local storage key

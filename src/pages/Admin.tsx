@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -61,7 +60,6 @@ const Admin = () => {
     isLoaded
   } = useSettingsManager();
   
-  // Check if user is already logged in via session storage
   useEffect(() => {
     const isLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
     if (isLoggedIn) {
@@ -188,14 +186,11 @@ const Admin = () => {
     const formData = new FormData(formElement);
     const updates: Record<string, string | number> = {};
     
-    // Convert form data to settings object with proper type handling
     formData.forEach((value, key) => {
-      // Skip File objects - we're not handling file uploads in settings
       if (value instanceof File) {
         return;
       }
       
-      // Convert numeric values
       if (key.includes('Seconds') || key.includes('Duration')) {
         const numValue = parseInt(value as string, 10);
         updates[key] = isNaN(numValue) ? 0 : numValue;
@@ -298,7 +293,7 @@ const Admin = () => {
         </header>
         
         <Tabs defaultValue="ads" className="mb-6">
-          <TabsList className="grid grid-cols-4 mb-4">
+          <TabsList className="grid grid-cols-6 mb-4">
             <TabsTrigger value="ads">
               <Layout className="w-4 h-4 mr-2" />
               Ads Manager
@@ -315,12 +310,18 @@ const Admin = () => {
               <Clock className="w-4 h-4 mr-2" />
               Timers
             </TabsTrigger>
+            <TabsTrigger value="seo">
+              <Settings className="w-4 h-4 mr-2" />
+              SEO
+            </TabsTrigger>
+            <TabsTrigger value="notifications">
+              <Settings className="w-4 h-4 mr-2" />
+              Notifications
+            </TabsTrigger>
           </TabsList>
           
-          {/* Ads Manager Tab */}
           <TabsContent value="ads" className="mt-0">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Current Ads List */}
               <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-md">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-semibold">Current Ad Units</h2>
@@ -443,7 +444,6 @@ const Admin = () => {
                 )}
               </div>
               
-              {/* Add New Ad Form */}
               <div className="bg-white rounded-xl p-6 shadow-md">
                 <h2 className="text-xl font-semibold mb-4">Add New Ad Unit</h2>
                 
@@ -496,7 +496,6 @@ const Admin = () => {
             </div>
           </TabsContent>
           
-          {/* Security Tab */}
           <TabsContent value="security" className="mt-0">
             <div className="grid grid-cols-1 gap-6">
               <Card>
@@ -577,7 +576,6 @@ const Admin = () => {
             </div>
           </TabsContent>
           
-          {/* Content Tab */}
           <TabsContent value="content" className="mt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
@@ -728,7 +726,6 @@ const Admin = () => {
             </div>
           </TabsContent>
           
-          {/* Timers Tab */}
           <TabsContent value="timers" className="mt-0">
             <Card>
               <CardHeader>
@@ -787,6 +784,140 @@ const Admin = () => {
                   <Button type="button" onClick={() => handleSaveSettings('timers')} className="mt-2">
                     <Save className="mr-2 h-4 w-4" />
                     Save Timer Settings
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="seo" className="mt-0">
+            <Card>
+              <CardHeader>
+                <CardTitle>SEO Settings</CardTitle>
+                <CardDescription>Optimize your site for search engines</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form id="seo-form" className="space-y-4">
+                  <div className="grid gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="siteTitle">Site Title</Label>
+                      <Input
+                        id="siteTitle"
+                        name="siteTitle"
+                        defaultValue={settings.siteTitle}
+                        placeholder="Your site title"
+                      />
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label htmlFor="siteDescription">Meta Description</Label>
+                      <Textarea
+                        id="siteDescription"
+                        name="siteDescription"
+                        defaultValue={settings.siteDescription}
+                        placeholder="Brief description of your site"
+                      />
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label htmlFor="siteKeywords">Meta Keywords</Label>
+                      <Input
+                        id="siteKeywords"
+                        name="siteKeywords"
+                        defaultValue={settings.siteKeywords}
+                        placeholder="keyword1, keyword2, keyword3"
+                      />
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label htmlFor="ogImage">OG Image URL</Label>
+                      <Input
+                        id="ogImage"
+                        name="ogImage"
+                        type="url"
+                        defaultValue={settings.ogImage}
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label htmlFor="twitterHandle">Twitter Handle</Label>
+                      <Input
+                        id="twitterHandle"
+                        name="twitterHandle"
+                        defaultValue={settings.twitterHandle}
+                        placeholder="@youraccount"
+                      />
+                    </div>
+                  </div>
+                  
+                  <Button type="button" onClick={() => handleSaveSettings('seo')} className="mt-4">
+                    <Save className="mr-2 h-4 w-4" />
+                    Save SEO Settings
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="notifications" className="mt-0">
+            <Card>
+              <CardHeader>
+                <CardTitle>Ad Blocker Notification</CardTitle>
+                <CardDescription>Customize the ad blocker detection message</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form id="notifications-form" className="space-y-4">
+                  <div className="grid gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="adBlockTitle">Title</Label>
+                      <Input
+                        id="adBlockTitle"
+                        name="adBlockTitle"
+                        defaultValue={settings.adBlockTitle}
+                      />
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label htmlFor="adBlockDescription">Description</Label>
+                      <Textarea
+                        id="adBlockDescription"
+                        name="adBlockDescription"
+                        defaultValue={settings.adBlockDescription}
+                      />
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label htmlFor="adBlockReloadButtonText">Reload Button Text</Label>
+                      <Input
+                        id="adBlockReloadButtonText"
+                        name="adBlockReloadButtonText"
+                        defaultValue={settings.adBlockReloadButtonText}
+                      />
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label htmlFor="adBlockHelpText">Help Text</Label>
+                      <Input
+                        id="adBlockHelpText"
+                        name="adBlockHelpText"
+                        defaultValue={settings.adBlockHelpText}
+                      />
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <Label htmlFor="adBlockHelpLink">Help Link</Label>
+                      <Input
+                        id="adBlockHelpLink"
+                        name="adBlockHelpLink"
+                        defaultValue={settings.adBlockHelpLink}
+                      />
+                    </div>
+                  </div>
+                  
+                  <Button type="button" onClick={() => handleSaveSettings('notifications')} className="mt-4">
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Notification Settings
                   </Button>
                 </form>
               </CardContent>

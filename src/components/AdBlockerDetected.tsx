@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { AlertCircle, X } from 'lucide-react';
 import { Button } from './ui/button';
+import { useSettingsManager } from '../utils/settingsManager';
 
 export const AdBlockerDetected = () => {
   const [isReloading, setIsReloading] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const { settings } = useSettingsManager();
   
   const handleReload = () => {
     setIsReloading(true);
@@ -27,19 +29,21 @@ export const AdBlockerDetected = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
               <AlertCircle className="h-6 w-6 text-redirector-primary" />
-              <h3 className="text-lg font-bold text-redirector-dark">Ad Blocker Detected</h3>
+              <h3 className="text-lg font-bold text-redirector-dark">
+                {settings.adBlockTitle}
+              </h3>
             </div>
             <button 
               onClick={handleDismiss}
               className="text-gray-500 hover:text-redirector-dark transition-colors"
-              aria-label="Dismiss"
+              aria-label={settings.adBlockDismissButtonText}
             >
               <X className="h-5 w-5" />
             </button>
           </div>
           
           <p className="text-sm text-gray-700 mb-4">
-            This site requires ad capability to function properly. Please disable your ad blocker or whitelist this site.
+            {settings.adBlockDescription}
           </p>
           
           <div className="flex space-x-3">
@@ -48,13 +52,13 @@ export const AdBlockerDetected = () => {
               className="w-full bg-redirector-primary text-white hover:bg-redirector-primary/90 transition-colors"
               disabled={isReloading}
             >
-              {isReloading ? 'Reloading...' : 'Reload with Ads Enabled'}
+              {isReloading ? 'Reloading...' : settings.adBlockReloadButtonText}
             </Button>
           </div>
         </div>
         
         <div className="bg-gray-50 p-3 text-xs text-gray-500 border-t border-gray-200 text-center">
-          Need help? Check our <a href="#" className="text-redirector-primary hover:underline">Ad Blocking Guide</a>
+          {settings.adBlockHelpText} <a href={settings.adBlockHelpLink} className="text-redirector-primary hover:underline">Ad Blocking Guide</a>
         </div>
       </div>
     </div>
