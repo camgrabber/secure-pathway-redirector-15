@@ -1,16 +1,22 @@
-
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Index = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   
   useEffect(() => {
-    // Use state to pass the URL instead of query parameters
+    // Check if the URL has a hash for admin
+    if (location.pathname === '/admin' || location.hash === '#admin') {
+      navigate('/admin');
+      return;
+    }
+    
+    // Otherwise redirect to initial redirect
     navigate('/initial-redirect', {
       state: { url: 'https://example.com' }
     });
-  }, [navigate]);
+  }, [navigate, location]);
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-200">
