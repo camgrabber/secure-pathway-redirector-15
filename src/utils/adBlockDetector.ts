@@ -4,14 +4,12 @@ export const checkForAdBlocker = async (): Promise<boolean> => {
   try {
     console.log("Running enhanced adblock detection...");
     
-    const results: boolean[] = [];
-    
     // Method 1: Create and check bait elements with known ad blocker targets
-    // Using fewer class names to reduce false positives
     const adClassNames = [
-      'ad-slot', 'adsbygoogle', 'ad-container'
+      'ad-slot', 'adsbygoogle', 'ad-container', 'adsbox', 'ad-placement'
     ];
     
+    let baitElementsBlocked = 0;
     for (const className of adClassNames) {
       const testAd = document.createElement('div');
       testAd.innerHTML = '&nbsp;';
@@ -36,50 +34,47 @@ export const checkForAdBlocker = async (): Promise<boolean> => {
       
       if (elemResult) {
         console.log(`Adblock detected: Bait element '${className}' was hidden`);
-        results.push(true);
+        baitElementsBlocked++;
       }
     }
     
     // Method 2: Try to fetch known ad network resources
-    // Using fewer URLs to reduce false positives
     const adUrls = [
-      'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'
+      'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
+      'https://securepubads.g.doubleclick.net/tag/js/gpt.js'
     ];
     
+    let fetchesBlocked = 0;
     try {
       const fetchPromises = adUrls.map(url => {
         return fetch(url, { 
           method: 'HEAD',
           mode: 'no-cors',
           cache: 'no-cache',
-          signal: AbortSignal.timeout(1000)
+          signal: AbortSignal.timeout(2000)
         })
         .then(() => false)
         .catch((error) => {
           console.log(`Ad fetch blocked for ${url}: ${error.message}`);
+          fetchesBlocked++;
           return true; // Fetch was blocked
         });
       });
       
-      const fetchResults = await Promise.all(fetchPromises);
-      const isAnyFetchBlocked = fetchResults.some(result => result === true);
-      
-      if (isAnyFetchBlocked) {
-        console.log('Adblock detected: Ad resource fetch was blocked');
-        results.push(true);
-      }
+      await Promise.all(fetchPromises);
     } catch (e) {
-      // Don't count network errors as ad blocking
-      console.log('Network fetch error in ad detection - skipping this check');
+      console.log('Network fetch error in ad detection - continuing with bait element results');
     }
     
-    // Final check: Need at least 2 positive detections to confirm ad blocker
-    // This helps prevent false positives
-    const isAdBlockerDetected = results.length >= 2;
+    // Check if any detection method found an adblocker
+    const isAdBlockerDetected = baitElementsBlocked >= 2 || fetchesBlocked >= 1;
     console.log(`Final adblock detection result: ${isAdBlockerDetected ? "BLOCKED" : "NOT BLOCKED"}`);
+    console.log(`Bait elements blocked: ${baitElementsBlocked}, Fetches blocked: ${fetchesBlocked}`);
+    
     return isAdBlockerDetected;
   } catch (e) {
     console.error('Error in enhanced adblock detection:', e);
-    return false; // Don't assume blocker exists if there's an error
+    // If there's an error, there's a higher chance an adblocker is causing it
+    return true;
   }
 };

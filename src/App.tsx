@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 import { AdBlockerDetected } from "./components/AdBlockerDetected";
 import { checkForAdBlocker } from "./utils/adBlockDetector";
+import { useToast } from "./hooks/use-toast";
 
 const queryClient = new QueryClient();
 
@@ -33,30 +34,38 @@ const App = () => {
         
         console.log("Starting enhanced adblock detection check...");
         
-        // First check - immediate
-        const initialCheck = await checkForAdBlocker();
+        // Run the check
+        const isBlocked = await checkForAdBlocker();
         
         // Update state based on check results
-        setAdBlockerDetected(initialCheck);
-        console.log(`Adblock final detection result: ${initialCheck ? "BLOCKED" : "NOT BLOCKED"}`);
+        setAdBlockerDetected(isBlocked);
+        console.log(`Adblock final detection result: ${isBlocked ? "BLOCKED" : "NOT BLOCKED"}`);
+        
+        // Store the result in sessionStorage to ensure consistent behavior during page navigation
+        if (isBlocked) {
+          sessionStorage.setItem('adBlockerDetected', 'true');
+        } else {
+          sessionStorage.removeItem('adBlockerDetected');
+        }
       } catch (error) {
         console.error("Error in adblock detection:", error);
-        // Only assume blocked on certain errors
-        if (error instanceof TypeError || error.name === 'SecurityError') {
-          setAdBlockerDetected(true);
-        } else {
-          // For other errors, don't assume blocked
-          setAdBlockerDetected(false);
-        }
+        // Assume blocked on errors for safety
+        setAdBlockerDetected(true);
+        sessionStorage.setItem('adBlockerDetected', 'true');
       } finally {
         setCheckComplete(true);
       }
     };
 
-    detectAdBlocker();
+    // Check for stored adBlocker status first for consistent behavior
+    const storedAdBlockerStatus = sessionStorage.getItem('adBlockerDetected');
+    if (storedAdBlockerStatus === 'true') {
+      setAdBlockerDetected(true);
+      setCheckComplete(true);
+    } else {
+      detectAdBlocker();
+    }
     
-    // We're removing the interval check as it's causing false positives
-    // Users can bypass if needed using the Continue Anyway button
   }, []);
 
   // Wrap everything in BrowserRouter to make sure we have proper routing context
