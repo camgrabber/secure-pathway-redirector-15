@@ -1,0 +1,13 @@
+
+# Netlify configuration file
+# This file ensures that all routes are properly handled by the single page application
+
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+# The following redirect rule tells Netlify that for any path, serve the index.html file
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
