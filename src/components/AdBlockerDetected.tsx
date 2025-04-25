@@ -21,8 +21,8 @@ export const AdBlockerDetected = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 max-w-md animate-in fade-in slide-in-from-bottom-5 duration-500">
-      <div className="bg-white/90 backdrop-blur-lg border border-redirector-primary/20 rounded-xl shadow-2xl overflow-hidden animate-scale">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
+      <div className="w-full max-w-md bg-white/90 backdrop-blur-lg border border-redirector-primary/20 rounded-xl shadow-2xl overflow-hidden animate-scale">
         <div className="p-6 bg-gradient-to-r from-redirector-primary/10 to-redirector-accent/10">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
